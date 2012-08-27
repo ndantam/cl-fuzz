@@ -112,8 +112,8 @@ RESULT: the result of TEST-FUNCTION"
                   (log *standard-output*)
                   (count 1))
   "Perform a series of fuzz tests.
-GENERATOR: (lambda ()) => fuzz
-TESTER: (lambda (fuzz)) => nil, performs one set of fuzz tests"
+GENERATOR: (lambda ()) => fuzz.
+TESTER: (lambda (fuzz)) => nil, performs one set of fuzz tests."
   (let ((*fuzz-counts* (make-hash-table))
         (*fuzz-log* log))
     (dotimes (i count)
@@ -123,3 +123,32 @@ TESTER: (lambda (fuzz)) => nil, performs one set of fuzz tests"
     (print `(:result
              ,(loop for k being the hash-keys of *fuzz-counts*
                  collect (list k (gethash k *fuzz-counts*)))))))
+
+;; each case returns new-structure-1
+(defmacro do-operations ((var-lambda-list &optional initial)
+                         fuzz
+                         &body cases)
+  "Perform a series of operations on the fuzz.
+
+Each case should return the value after processing the current
+operation, or NIL if the test failed.  INITIAL and the true result of
+each of CASES will be DESTRUCTURING-BIND'ed to VAR-LAMBDA-LIST.
+
+FUZZ:  (list (list &rest operation))
+CASES: ((destructuring-case-lambda-list) &body body) => result"
+  (alexandria:with-gensyms (var fuzz-item block result)
+    `(block ,block
+       (reduce (lambda (,var ,fuzz-item)
+                 (destructuring-bind ,var-lambda-list ,var
+                   (let ((,result
+                          (alexandria:destructuring-ecase ,fuzz-item
+                            ,@(loop for case in cases
+                                 for op = (car case)
+                                 for body = (cdr case)
+                                 collect
+                                   `(,op (test-true ,(car op)
+                                                    (lambda () ,@body)))))))
+                     (if ,result
+                         ,result
+                         (return-from ,block nil)))))
+               ,fuzz :initial-value ,initial))))

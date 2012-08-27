@@ -38,4 +38,5 @@
 (asdf:defsystem cl-fuzz
   :version "0.0.1"
   :description "A Fuzz Testing Framework"
+  :depends-on (:alexandria)
   :components ((:file "fuzz")))

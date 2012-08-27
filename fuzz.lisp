@@ -43,7 +43,7 @@
 (defpackage :cl-fuzz
   (:use :cl)
   (:nicknames :fuzz)
-  (:export perform-tests
+  (:export run-tests
            test-true test-false
            test-eq test-eql test-equal test-equalp test=))
 
@@ -107,10 +107,10 @@ RESULT: the result of TEST-FUNCTION"
   (test-test name #'= expected-function test-function))
 
 ;; TODO: catch assertions in tester and generator functions
-(defun perform-tests (generator tester &key
-                      (formatter #'identity)
-                      (log *standard-output*)
-                      (count 1))
+(defun run-tests (generator tester &key
+                  (formatter #'identity)
+                  (log *standard-output*)
+                  (count 1))
   "Perform a series of fuzz tests.
 GENERATOR: (lambda ()) => fuzz
 TESTER: (lambda (fuzz)) => nil, performs one set of fuzz tests"

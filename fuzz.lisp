@@ -62,20 +62,29 @@ successful test.  If result is false, print an error message.
 NAME: name of this test
 TEST-FUNCTION: (lambda ()) => (or nil RESULT)
 RESULT: the result of TEST-FUNCTION"
-  (let ((result (handler-case (funcall test-function) ; catch errors thrown by test
-                  (condition (e) ;error
-                    (pprint `(:condition ,name :description ,(write-to-string e) :input ,*fuzz-input*)
-                            *fuzz-log*)
-                    (return-from test-true)))))
+  (let* ((batched (and (boundp '*fuzz-log*)
+                       (boundp '*fuzz-input*)
+                       (boundp '*fuzz-counts*)))
+         (result (if batched
+                     ;; catch errors thrown by test
+                     (handler-case (funcall test-function)
+                       (condition (e) ;error
+                         (pprint `(:condition ,name :description ,(write-to-string e) :input ,*fuzz-input*)
+                                 *fuzz-log*)
+                         (return-from test-true)))
+                     ;; throw errors back to our caller (and the debugger, probably)
+                     (funcall test-function))))
     (if result
         ;; test passed, increment success count
-        (when (and (boundp '*fuzz-counts*)
-                   *fuzz-counts*)
+        (when batched
           (incf (gethash name *fuzz-counts* 0)))
-        ;; test failed, print failure message to log
-        (pprint `(:fail ,name :input ,*fuzz-input*) *fuzz-log*))
+        ;; test failed,
+        (if batched
+            ;; print failure message to log
+            (pprint `(:fail ,name :input ,*fuzz-input*) *fuzz-log*)
+            ;; No log, break to debugger
+            (break)))
     result))
-
 
 (defun test-false (name test-function)
   "Call TEST-FUNCTION and test if result is false."

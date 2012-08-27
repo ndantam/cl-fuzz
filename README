@@ -1,0 +1,22 @@
+CL-FUZZ
+=======
+A simple fuzz-testing package for Common Lisp
+
+Usage
+=====
+* Load CL-FUZZ via asdf
+* Define a function to generate random data, aka the fuzz
+* Define a function to perform some tests on the fuzz
+* Pass these functions to FUZZ:PERFORM-TESTS
+* For more details, see http://ndantam.github.com/cl-fuzz
+  and the included example.lisp file
+
+Example
+=======
+A trivial example to test #'EVENP and #'ODDP:
+
+    (fuzz:perform-tests (lambda () (* 2 (random 1000)))                   ; generator
+                        (lambda (fuzz)                                    ; tester
+                          (fuzz:test-true 'even (lambda () (evenp fuzz))) ; test 1
+                          (fuzz:test-false 'odd (lambda () (oddp fuzz)))) ; test 2
+                        :count 100)

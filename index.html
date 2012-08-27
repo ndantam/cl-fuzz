@@ -46,7 +46,7 @@ license</a> so you can basically do with it whatever you want.
   <li><a href="#download">Download</a>
   <li><a href="#dictionary">The CL-FUZZ dictionary</a>
     <ol>
-      <li><a href="#perform-tests"><code>perform-tests</code></a>
+      <li><a href="#run-tests"><code>run-tests</code></a>
       <li><a href="#test-eq"><code>test-eq</code></a>
       <li><a href="#test-eql"><code>test-eql</code></a>
       <li><a href="#test-equal"><code>test-equal</code></a>
@@ -68,18 +68,18 @@ https://github.com/ndantam/cl-fuzz</a>.
 
 
 
-<!-- Entry for PERFORM-TESTS -->
+<!-- Entry for RUN-TESTS -->
 
-<p><br>[Function]<br><a class=none name='perform-tests'><b>perform-tests</b> <i>generator tester <tt>&amp;key</tt> formatter log count</i> =&gt; <i>result</i></a>
+<p><br>[Function]<br><a class=none name='run-tests'><b>run-tests</b> <i>generator tester <tt>&amp;key</tt> formatter log count</i> =&gt; <i>result</i></a>
 <blockquote><br>
 
 Perform a series of fuzz tests.
-GENERATOR: (lambda ()) =&gt; fuzz
-TESTER: (lambda (fuzz)) =&gt; nil, performs one set of fuzz tests
+GENERATOR: (lambda ()) =&gt; fuzz.
+TESTER: (lambda (fuzz)) =&gt; nil, performs one set of fuzz tests.
 
 </blockquote>
 
-<!-- End of entry for PERFORM-TESTS -->
+<!-- End of entry for RUN-TESTS -->
 
 
 <!-- Entry for TEST-EQ -->

@@ -1,0 +1,180 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>CL-FUZZ - Fuzz Testing in Common Lisp</title>
+  <style type="text/css">
+  pre { padding:5px; background-color:#e0e0e0 }
+  h3, h4 { text-decoration: underline; }
+  a { text-decoration: none; padding: 1px 2px 1px 2px; }
+  a:visited { text-decoration: none; padding: 1px 2px 1px 2px; }
+  a:hover { text-decoration: none; padding: 1px 1px 1px 1px; border: 1px solid #000000; }
+  a:focus { text-decoration: none; padding: 1px 2px 1px 2px; border: none; }
+  a.none { text-decoration: none; padding: 0; }
+  a.none:visited { text-decoration: none; padding: 0; }
+  a.none:hover { text-decoration: none; border: none; padding: 0; }
+  a.none:focus { text-decoration: none; border: none; padding: 0; }
+  a.noborder { text-decoration: none; padding: 0; }
+  a.noborder:visited { text-decoration: none; padding: 0; }
+  a.noborder:hover { text-decoration: none; border: none; padding: 0; }
+  a.noborder:focus { text-decoration: none; border: none; padding: 0; }
+  pre.none { padding:5px; background-color:#ffffff }
+  </style>
+</head>
+
+<body bgcolor=white>
+
+<h2> CL-FUZZ - Fuzz Testing in Common Lisp</h2>
+
+<blockquote>
+<br>&nbsp;<br><h3><a name=abstract class=none>Abstract</a></h3> This
+is a very
+simple <a href="http://en.wikipedia.org/wiki/Fuzz_testing">fuzz
+testing</a> framework.  The code comes with
+a <a href="http://www.opensource.org/licenses/bsd-license.php">BSD-style
+license</a> so you can basically do with it whatever you want.
+
+<p>
+<font color=red>Download
+  shortcut:</font> <code> git
+  clone <a href="https://github.com/ndantam/cl-fuzz">https://github.com/ndantam/cl-fuzz</a></code>
+</blockquote>
+
+<br>&nbsp;<br><h3><a class=none name="contents">Contents</a></h3>
+<ol>
+  <li><a href="#download">Download</a>
+  <li><a href="#dictionary">The CL-FUZZ dictionary</a>
+    <ol>
+      <li><a href="#perform-tests"><code>perform-tests</code></a>
+      <li><a href="#test-eq"><code>test-eq</code></a>
+      <li><a href="#test-eql"><code>test-eql</code></a>
+      <li><a href="#test-equal"><code>test-equal</code></a>
+      <li><a href="#test-equalp"><code>test-equalp</code></a>
+      <li><a href="#test-false"><code>test-false</code></a>
+      <li><a href="#test-true"><code>test-true</code></a>
+      <li><a href="#test="><code>test=</code></a>
+    </ol>
+  <li><a href="#ack">Acknowledgements</a>
+</ol>
+
+<br>&nbsp;<br><h3><a class=none name="download">Download</a></h3>
+
+CL-FUZZ together with this documentation can be downloaded
+from <a href="https://github.com/ndantam/cl-fuzz">
+https://github.com/ndantam/cl-fuzz</a>.
+
+<br>&nbsp;<br><h3><a class=none name="dictionary">The CL-FUZZ dictionary</a></h3>
+
+
+
+<!-- Entry for PERFORM-TESTS -->
+
+<p><br>[Function]<br><a class=none name='perform-tests'><b>perform-tests</b> <i>generator tester <tt>&amp;key</tt> formatter log count</i> =&gt; <i>result</i></a>
+<blockquote><br>
+
+Perform a series of fuzz tests.
+GENERATOR: (lambda ()) =&gt; fuzz
+TESTER: (lambda (fuzz)) =&gt; nil, performs one set of fuzz tests
+
+</blockquote>
+
+<!-- End of entry for PERFORM-TESTS -->
+
+
+<!-- Entry for TEST-EQ -->
+
+<p><br>[Function]<br><a class=none name='test-eq'><b>test-eq</b> <i>name expected-function test-function</i> =&gt; <i>result</i></a>
+<blockquote><br>
+
+Call EXPECTED-FUNCTION and TEST-FUNCTION and test if results are #&#039;EQ.
+
+</blockquote>
+
+<!-- End of entry for TEST-EQ -->
+
+
+<!-- Entry for TEST-EQL -->
+
+<p><br>[Function]<br><a class=none name='test-eql'><b>test-eql</b> <i>name expected-function test-function</i> =&gt; <i>result</i></a>
+<blockquote><br>
+
+Call EXPECTED-FUNCTION and TEST-FUNCTION and test if results are #&#039;EQL.
+
+</blockquote>
+
+<!-- End of entry for TEST-EQL -->
+
+
+<!-- Entry for TEST-EQUAL -->
+
+<p><br>[Function]<br><a class=none name='test-equal'><b>test-equal</b> <i>name expected-function test-function</i> =&gt; <i>result</i></a>
+<blockquote><br>
+
+Call EXPECTED-FUNCTION and TEST-FUNCTION and test if results are #&#039;EQUAL.
+
+</blockquote>
+
+<!-- End of entry for TEST-EQUAL -->
+
+
+<!-- Entry for TEST-EQUALP -->
+
+<p><br>[Function]<br><a class=none name='test-equalp'><b>test-equalp</b> <i>name expected-function test-function</i> =&gt; <i>result</i></a>
+<blockquote><br>
+
+Call EXPECTED-FUNCTION and TEST-FUNCTION and test if results are #&#039;EQUALP.
+
+</blockquote>
+
+<!-- End of entry for TEST-EQUALP -->
+
+
+<!-- Entry for TEST-FALSE -->
+
+<p><br>[Function]<br><a class=none name='test-false'><b>test-false</b> <i>name test-function</i> =&gt; <i>result</i></a>
+<blockquote><br>
+
+Call TEST-FUNCTION and test if result is false.
+
+</blockquote>
+
+<!-- End of entry for TEST-FALSE -->
+
+
+<!-- Entry for TEST-TRUE -->
+
+<p><br>[Function]<br><a class=none name='test-true'><b>test-true</b> <i>name test-function</i> =&gt; <i>result</i></a>
+<blockquote><br>
+
+Call TEST-FUNCTION with no arguments.  If result is true, mark
+successful test.  If result is false, print an error message.
+NAME: name of this test
+TEST-FUNCTION: (lambda ()) =&gt; (or nil RESULT)
+RESULT: the result of TEST-FUNCTION
+
+</blockquote>
+
+<!-- End of entry for TEST-TRUE -->
+
+
+<!-- Entry for TEST= -->
+
+<p><br>[Function]<br><a class=none name='test='><b>test=</b> <i>name expected-function test-function</i> =&gt; <i>result</i></a>
+<blockquote><br>
+
+Call EXPECTED-FUNCTION and TEST-FUNCTION and test if results are #&#039;=.
+
+</blockquote>
+
+<!-- End of entry for TEST= -->
+
+
+<br>&nbsp;<br><h3><a class=none name="ack">Acknowledgements</a></h3>
+
+<p>
+This documentation was prepared with <a href="http://weitz.de/documentation-template/">DOCUMENTATION-TEMPLATE</a>.
+</p>
+
+</body>
+</html>

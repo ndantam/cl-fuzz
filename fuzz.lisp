@@ -55,6 +55,8 @@
 (defvar *fuzz-log*)
 (defvar *fuzz-input*)
 (defvar *fuzz-counts*)
+(defvar *fuzz-var*)
+(defvar *fuzz-trail*)
 
 (defun test-true (name test-function)
 "Call TEST-FUNCTION with no arguments.  If result is true, mark
@@ -82,8 +84,13 @@ RESULT: the result of TEST-FUNCTION"
         (if batched
             ;; print failure message to log
             (pprint `(:fail ,name :input ,*fuzz-input*) *fuzz-log*)
-            ;; No log, break to debugger
-            (break)))
+            (progn
+              (when (boundp '*fuzz-var*)
+                (pprint *fuzz-var*))
+              (when (boundp '*fuzz-trail*)
+                (pprint (reverse *fuzz-trail*)))
+              ;; No log, break to debugger
+              (break))))
     result))
 
 (defun test-false (name test-function)
@@ -146,18 +153,22 @@ each of CASES will be DESTRUCTURING-BIND'ed to VAR-LAMBDA-LIST.
 FUZZ:  (list (list &rest operation))
 CASES: ((destructuring-case-lambda-list) &body body) => result"
   (alexandria:with-gensyms (var fuzz-item block result)
-    `(block ,block
-       (reduce (lambda (,var ,fuzz-item)
-                 (destructuring-bind ,var-lambda-list ,var
-                   (let ((,result
-                          (alexandria:destructuring-ecase ,fuzz-item
-                            ,@(loop for case in cases
-                                 for op = (car case)
-                                 for body = (cdr case)
-                                 collect
-                                   `(,op (test-true ,(car op)
-                                                    (lambda () ,@body)))))))
-                     (if ,result
-                         ,result
-                         (return-from ,block nil)))))
-               ,fuzz :initial-value ,initial))))
+    `(let ((*fuzz-var* nil)
+           (*fuzz-trail* nil))
+       (block ,block
+         (reduce (lambda (,var ,fuzz-item)
+                   (push ,fuzz-item *fuzz-trail*)
+                   (setq *fuzz-var* ,var)
+                   (destructuring-bind ,var-lambda-list ,var
+                     (let ((,result
+                            (alexandria:destructuring-ecase ,fuzz-item
+                              ,@(loop for case in cases
+                                   for op = (car case)
+                                   for body = (cdr case)
+                                   collect
+                                     `(,op (test-true ,(car op)
+                                                      (lambda () (progn ,@body))))))))
+                       (if ,result
+                           ,result
+                           (return-from ,block nil)))))
+                 ,fuzz :initial-value ,initial)))))

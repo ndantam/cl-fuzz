@@ -97,16 +97,14 @@ RESULT: the result of TEST-FUNCTION"
   "Call TEST-FUNCTION and test if result is false."
   (test-true name (lambda () (not (funcall test-function)))))
 
-(defun test-predicate (name predicate expected-function test-function)
-  "Test if PREDICATE applied to the results of EXPECTED-FUNCTION and TEST-FUNCTION is T.
+(defun test-predicate (name predicate &rest result-functions)
+  "Test if PREDICATE applied to the results other arguments is T.
 
-PREDICATE: (lambda (a b))
-EXPECTED-FUNCTION: (lambda ()) -- returns expected value for this test
-TEST-FUNCTION: (lambda ()) -- returns the result to check against the expected value
+PREDICATE: (or (lambda (a b)) (lambda (a)))
+RESULT-FUNCTIONS: (lambda ()) -- returns the arguments for predicate
 "
-  (test-true name (lambda () (funcall predicate
-                                 (funcall expected-function)
-                                 (funcall test-function)))))
+  (test-true name (lambda () (apply predicate
+                                    (map 'list #'funcall result-functions)))))
 
 (defun test-eq (name expected-function test-function)
   "Call EXPECTED-FUNCTION and TEST-FUNCTION and test if results are #'EQ."

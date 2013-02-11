@@ -44,7 +44,7 @@
   (:use :cl)
   (:nicknames :fuzz)
   (:export run-tests
-           test-true test-false
+           test-true test-false test-predicate
            test-eq test-eql test-equal test-equalp test=))
 
 ;;;;;;;;;;;;;;
@@ -97,30 +97,36 @@ RESULT: the result of TEST-FUNCTION"
   "Call TEST-FUNCTION and test if result is false."
   (test-true name (lambda () (not (funcall test-function)))))
 
-(defun test-test (name test expected-function test-function)
-  (test-true name (lambda () (funcall test
+(defun test-predicate (name predicate expected-function test-function)
+  "Test if PREDICATE applied to the results of EXPECTED-FUNCTION and TEST-FUNCTION is T.
+
+PREDICATE: (lambda (a b))
+EXPECTED-FUNCTION: (lambda ()) -- returns expected value for this test
+TEST-FUNCTION: (lambda ()) -- returns the result to check against the expected value
+"
+  (test-true name (lambda () (funcall predicate
                                  (funcall expected-function)
                                  (funcall test-function)))))
 
 (defun test-eq (name expected-function test-function)
   "Call EXPECTED-FUNCTION and TEST-FUNCTION and test if results are #'EQ."
-  (test-test name #'eq expected-function test-function))
+  (test-predicate name #'eq expected-function test-function))
 
 (defun test-eql (name expected-function test-function)
   "Call EXPECTED-FUNCTION and TEST-FUNCTION and test if results are #'EQL."
-  (test-test name #'eql expected-function test-function))
+  (test-predicate name #'eql expected-function test-function))
 
 (defun test-equal (name expected-function test-function)
   "Call EXPECTED-FUNCTION and TEST-FUNCTION and test if results are #'EQUAL."
-  (test-test name #'equal expected-function test-function))
+  (test-predicate name #'equal expected-function test-function))
 
 (defun test-equalp (name expected-function test-function)
   "Call EXPECTED-FUNCTION and TEST-FUNCTION and test if results are #'EQUALP."
-  (test-test name #'equal expected-function test-function))
+  (test-predicate name #'equal expected-function test-function))
 
 (defun test= (name expected-function test-function)
   "Call EXPECTED-FUNCTION and TEST-FUNCTION and test if results are #'=."
-  (test-test name #'= expected-function test-function))
+  (test-predicate name #'= expected-function test-function))
 
 ;; TODO: catch assertions in tester and generator functions
 (defun run-tests (generator tester &key

@@ -72,7 +72,7 @@ RESULT: the result of TEST-FUNCTION"
                      ;; catch errors thrown by test
                      (handler-case (funcall test-function)
                        (condition (e) ;error
-                         (pprint `(:condition ,name :description ,(write-to-string e)
+                         (pprint `(:condition ,name :description ,(princ-to-string e)
                                               :random ,*fuzz-random*
                                               :input ,*fuzz-input*)
                                  *fuzz-log*)

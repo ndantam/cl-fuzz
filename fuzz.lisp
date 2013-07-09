@@ -57,6 +57,7 @@
 (defvar *fuzz-counts*)
 (defvar *fuzz-var*)
 (defvar *fuzz-trail*)
+(defvar *fuzz-random*)
 
 (defun test-true (name test-function)
 "Call TEST-FUNCTION with no arguments.  If result is true, mark
@@ -71,7 +72,9 @@ RESULT: the result of TEST-FUNCTION"
                      ;; catch errors thrown by test
                      (handler-case (funcall test-function)
                        (condition (e) ;error
-                         (pprint `(:condition ,name :description ,(write-to-string e) :input ,*fuzz-input*)
+                         (pprint `(:condition ,name :description ,(write-to-string e)
+                                              :random ,*fuzz-random*
+                                              :input ,*fuzz-input*)
                                  *fuzz-log*)
                          (return-from test-true)))
                      ;; throw errors back to our caller (and the debugger, probably)
@@ -83,7 +86,7 @@ RESULT: the result of TEST-FUNCTION"
         ;; test failed,
         (if batched
             ;; print failure message to log
-            (pprint `(:fail ,name :input ,*fuzz-input*) *fuzz-log*)
+            (pprint `(:fail ,name :input ,*fuzz-input* :random ,*fuzz-random*) *fuzz-log*)
             (progn
               (when (boundp '*fuzz-var*)
                 (pprint *fuzz-var*))
@@ -128,7 +131,7 @@ RESULT-FUNCTIONS: (lambda ()) -- returns the arguments for predicate
 
 ;; TODO: catch assertions in tester and generator functions
 (defun run-tests (generator tester &key
-                  (formatter #'identity)
+                  formatter
                   (log *standard-output*)
                   (count 1))
   "Perform a series of fuzz tests.
@@ -137,8 +140,10 @@ TESTER: (lambda (fuzz)) => nil, performs one set of fuzz tests."
   (let ((*fuzz-counts* (make-hash-table))
         (*fuzz-log* log))
     (dotimes (i count)
-      (let* ((input (funcall generator))
-             (*fuzz-input* (funcall formatter input)))
+      (let* ((*fuzz-random* (make-random-state *random-state*))
+             (input (funcall generator))
+             (*fuzz-input* (when formatter
+                               (funcall formatter input))))
         (funcall tester input)))
     (print `(:result
              ,(loop for k being the hash-keys of *fuzz-counts*

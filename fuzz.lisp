@@ -45,7 +45,8 @@
   (:nicknames :fuzz)
   (:export run-tests
            test-true test-false test-predicate
-           test-eq test-eql test-equal test-equalp test=))
+           test-eq test-eql test-equal test-equalp test=
+           do-test))
 
 ;;;;;;;;;;;;;;
 ;;; CL-FUZZ ;;
@@ -73,7 +74,7 @@ RESULT: the result of TEST-FUNCTION"
                      (handler-case (funcall test-function)
                        (condition (e) ;error
                          (pprint `(:condition ,name :description ,(princ-to-string e)
-                                              :random ,*fuzz-random*
+                                              ,@(unless *fuzz-input* (list :random *fuzz-random*))
                                               :input ,*fuzz-input*)
                                  *fuzz-log*)
                          (return-from test-true)))
@@ -86,7 +87,10 @@ RESULT: the result of TEST-FUNCTION"
         ;; test failed,
         (if batched
             ;; print failure message to log
-            (pprint `(:fail ,name :input ,*fuzz-input* :random ,*fuzz-random*) *fuzz-log*)
+            (pprint `(:fail ,name
+                            :input ,*fuzz-input*
+                            ,@(unless *fuzz-input* (list :random *fuzz-random*)))
+                    *fuzz-log*)
             (progn
               (when (boundp '*fuzz-var*)
                 (pprint *fuzz-var*))
@@ -148,6 +152,16 @@ TESTER: (lambda (fuzz)) => nil, performs one set of fuzz tests."
     (print `(:result
              ,(loop for k being the hash-keys of *fuzz-counts*
                  collect (list k (gethash k *fuzz-counts*)))))))
+
+
+(defmacro do-test ((name &key (test #'eql)) expected-expression test-expression)
+  "Compares the result of `EXPECTED-EXPRESSION' and `TEST-EXPRESSION' using `TEST'.
+
+NAME: A name for this test.
+TEST: (lambda (expected-value actual-value)) => (or t nil)."
+  `(test-predicate ,name ,test
+                   (lambda () ,expected-expression)
+                   (lambda () ,test-expression)))
 
 ;; each case returns new-structure-1
 (defmacro do-operations ((var-lambda-list &optional initial)

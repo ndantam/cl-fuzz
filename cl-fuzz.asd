@@ -38,5 +38,7 @@
 (asdf:defsystem cl-fuzz
   :version "0.0.1"
   :description "A Fuzz Testing Framework"
+  :author "Neil T. Dantam"
   :depends-on (:alexandria)
+  :license :bsd-2
   :components ((:file "fuzz")))
